@@ -1,6 +1,7 @@
 *~
 *.elc
 auto-save-list
+ac-comphist.dat
 recentf
 savehist
 saveplace
@@ -9,6 +10,7 @@ elpa
 el-get
 semanticdb
 url
+ido.last
 ede-projects.el
 .DS_Store
 custom.el
