@@ -1,8 +1,11 @@
-;;; Commentary
+;;; user.el -- customizations to Prelude
+
+;;; Commentary:
 
 ;; Personalizations
 
-;;; Code
+;;; Code:
+
 ;; misc keybinding:
 
 (global-set-key (kbd "C-o") 'other-window)
@@ -12,9 +15,8 @@
 
 ;; minimal UI
 
-(when window-system
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1))
+(menu-bar-mode -1)
+(tool-bar-mode -1)
 
 ;; turn off Flycheck
 
@@ -26,10 +28,11 @@
 
 ;; personal packages
 
-(defvar my-packages '(writeroom-mode clj-refactor rainbow-delimiters))
+(defvar my-packages '(olivetti clj-refactor rainbow-delimiters))
 
 
 (defun update-packages (packages)
+  "Update custom packages defined in PACKAGES."
   (package-refresh-contents)
   (dolist (p packages)
     (when (not (package-installed-p p))
@@ -41,21 +44,24 @@
 ;; restart:
 
 (defun insert-current-date ()
+  "Insert the current date into the buffer."
   (interactive)
   (insert (shell-command-to-string "echo -n $(date +%Y-%m-%d)")))
 
 (defun write-date-to-disk ()
+  "Write the current date to disk in a file."
   (with-temp-buffer
     (insert-current-date)
     (write-file "~/.emacs.d/.update.time")))
 
 (defun get-string-from-file (file-path)
-  "Return file-path's file content."
+  "Return FILE-PATH's file content."
   (with-temp-buffer
     (insert-file-contents file-path)
     (buffer-string)))
 
 (defun update-packages-if-outdated ()
+  "Iterate over the list of my-packages and update, once a day."
   (let ((current-date (substring (with-temp-buffer (insert-current-date)
                                                    (buffer-string))
                                  0 10))
@@ -68,6 +74,7 @@
 (update-packages-if-outdated)
 
 (defun create-shell-in-new-buffer ()
+  "Create a new shell rather than switching to an open one."
   (interactive)
   (let ((currentbuf (get-buffer-window (current-buffer)))
         (newbuf (generate-new-buffer-name "*shell*")))
@@ -101,34 +108,12 @@
 ;; (mapc (lambda (s) (put-clojure-indent s 'defun))
 ;;      '(GET* PUT* DELETE* POST* PATCH* context))
 
-;; Highlight long lines
 
-(defvar highlight-long-lines nil)
-
-(defun highlight-long-lines ()
-  "Turn on highlighting of long lines."
-  (interactive)
-  (setq highlight-long-lines t)
-  (highlight-lines-matching-regexp ".\\{81\\}" 'hi-pink))
-
-
-(defun unhighlight-long-lines ()
-  "Turn off highlighting of long lines."
-  (interactive)
-  (setq highlight-long-lines nil)
-  (unhighlight-regexp "^.*\\(?:.\\{81\\}\\).*$"))
-
-
-(defun toggle-highlight-long-lines ()
-  (interactive)
-  (if highlight-long-lines
-      (unhighlight-long-lines)
-    (highlight-long-lines)))
-
-(global-set-key (kbd "C-c h") 'toggle-highlight-long-lines)
+(global-set-key (kbd "C-c h") 'whitespace-mode)
 
 
 (defun switch-to-paredit ()
+  "Turn off smartparens, turn on paredit."
   (smartparens-mode -1)
   (paredit-mode 1))
 
@@ -139,13 +124,18 @@
 (add-hook 'clojure-mode-hook (lambda ()
                                (switch-to-paredit)
                                (clj-refactor-mode 1)
-                               (cljr-add-keybindings-with-prefix "C-c C-r")
-                               (highlight-long-lines)))
+                               (cljr-add-keybindings-with-prefix "C-c C-r")))
 
 
 (add-hook 'lisp-mode-hook #'switch-to-paredit)
-(add-hook 'elisp-mode-hook #'switch-to-paredit)
+(add-hook 'emacs-lisp-mode-hook #'switch-to-paredit)
 
+
+(mapc (lambda (s) (put-clojure-indent s 1))
+      '(describe describe-server it before-all after-all before after
+        init-state render render-state will-mount did-mount should-update
+        will-receive-props will-update did-update display-name will-unmount
+        describe-with-db describe-with-server swaggered context around))
 
 ;; haskell
 
@@ -153,6 +143,7 @@
 
 
 (defun pretty-lambdas-haskell ()
+  "Replace \ with lambda in haskell mode."
   (font-lock-add-keywords
    nil `((,(concat "\\(" (regexp-quote "\\") "\\)")
           (0 (progn (compose-region (match-beginning 1) (match-end 1)
@@ -181,6 +172,7 @@
 (require 'ox-md)
 
 (defun lmb-insert-org-src-block (lang)
+  "Insert source block of language LANG."
   (interactive "sEnter source language: ")
   (insert "#+BEGIN_SRC " lang "\n\n#+END_SRC")
   (move-beginning-of-line 1)
@@ -188,6 +180,14 @@
 
 ;; Writing settings
 
+(setq prelude-whitespace nil)
 
-(add-hook 'org-mode-hook (lambda () (writeroom-mode)))
-(add-hook 'writeroom-mode-hook (lambda () (auto-fill-mode)))
+(add-hook 'prelude-prog-mode-hook #'whitespace-mode)
+
+(add-hook 'text-mode-hook (lambda ()
+                            (olivetti-mode)
+                            (setq tab-width 4)))
+
+
+(provide 'user)
+;;; user.el ends here
