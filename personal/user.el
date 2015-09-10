@@ -8,6 +8,7 @@
 
 ;; misc keybinding:
 
+
 (global-set-key (kbd "C-o") 'other-window)
 (global-set-key (kbd "C-c j") 'join-line)
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -133,9 +134,9 @@
 
 (mapc (lambda (s) (put-clojure-indent s 1))
       '(describe describe-server it before-all after-all before after
-        init-state render render-state will-mount did-mount should-update
-        will-receive-props will-update did-update display-name will-unmount
-        describe-with-db describe-with-server swaggered context around))
+                 init-state render render-state will-mount did-mount should-update
+                 will-receive-props will-update did-update display-name will-unmount
+                 describe-with-db describe-with-server swaggered context around))
 
 ;; haskell
 
@@ -183,6 +184,8 @@
 (setq prelude-whitespace nil)
 
 (add-hook 'prelude-prog-mode-hook #'whitespace-mode)
+
+(setq prelude-guru nil)
 
 (add-hook 'text-mode-hook (lambda ()
                             (olivetti-mode)
