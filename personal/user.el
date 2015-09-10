@@ -29,7 +29,8 @@
 
 ;; personal packages
 
-(defvar my-packages '(olivetti clj-refactor rainbow-delimiters))
+(defvar my-packages '(olivetti clj-refactor rainbow-delimiters rust-mode
+                      flycheck-rust flycheck-clojure flycheck-pos-tip))
 
 
 (defun update-packages (packages)
@@ -40,6 +41,7 @@
       (condition-case err
           (package-install p)
         (error (message "%s" (error-message-string err)))))))
+
 
 ;; track the date of last package update so we don't have to update on every
 ;; restart:
@@ -87,7 +89,9 @@
 (global-set-key (kbd "C-c t") 'create-shell-in-new-buffer)
 
 
+
 (add-to-list 'load-path "~/.emacs.d/personal/vendor")
+
 (require 'rainbow-delimiters)
 
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
@@ -136,7 +140,21 @@
       '(describe describe-server it before-all after-all before after
                  init-state render render-state will-mount did-mount should-update
                  will-receive-props will-update did-update display-name will-unmount
-                 describe-with-db describe-with-server swaggered context around))
+                 describe-with-db describe-with-server swaggered context around
+                 legal-moves pseudo-legal-moves GET* POST* PUT* PATCH* DELETE*))
+
+;; flycheck for clojure
+
+(eval-after-load 'flycheck '(flycheck-clojure-setup))
+(add-hook 'after-init-hook #'global-flycheck-mode)
+(eval-after-load 'flycheck
+    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
+
+;; rust
+
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+
+(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
 
 ;; haskell
 
@@ -178,6 +196,27 @@
   (insert "#+BEGIN_SRC " lang "\n\n#+END_SRC")
   (move-beginning-of-line 1)
   (forward-line -1))
+
+;; Misc fns
+
+(defun json->clj-map ()
+  "Reformat a JSON string as a Clojure map."
+  (interactive)
+  (when (region-active-p)
+    (replace-regexp "null" "nil"
+                    nil (region-beginning) (region-end))
+    (replace-regexp "\\(\"\\([A-z0-9_-]+\\)\"\s*:\\)" ":\\2 "
+                    nil (region-beginning) (region-end))
+    (replace-regexp "," ""
+                    nil (region-beginning) (region-end))))
+
+
+
+(defun open-dot-emacs ()
+  "Open this file."
+  (interactive)
+  (find-file "~/.emacs.d/personal/user.el"))
+
 
 ;; Writing settings
 
