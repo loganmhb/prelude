@@ -19,10 +19,6 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 
-;; turn off Flycheck
-
-(flycheck-mode -1)
-
 ;; stop making noise when I scroll
 
 (setq ring-bell-function #'ignore)
@@ -30,7 +26,8 @@
 ;; personal packages
 
 (defvar my-packages '(olivetti clj-refactor rainbow-delimiters rust-mode
-                      flycheck-rust flycheck-clojure flycheck-pos-tip))
+                               flycheck-rust flycheck-clojure flycheck-pos-tip
+                               cider))
 
 
 (defun update-packages (packages)
@@ -141,7 +138,11 @@
                  init-state render render-state will-mount did-mount should-update
                  will-receive-props will-update did-update display-name will-unmount
                  describe-with-db describe-with-server swaggered context around
-                 legal-moves pseudo-legal-moves GET* POST* PUT* PATCH* DELETE*))
+                 legal-moves pseudo-legal-moves))
+
+
+(mapc (lambda (s) (put-clojure-indent s 2))
+      '(GET* POST* PUT* DELETE* PATCH* context*))
 
 ;; flycheck for clojure
 
@@ -199,17 +200,19 @@
 
 ;; Misc fns
 
-(defun json->clj-map ()
-  "Reformat a JSON string as a Clojure map."
-  (interactive)
-  (when (region-active-p)
-    (replace-regexp "null" "nil"
-                    nil (region-beginning) (region-end))
-    (replace-regexp "\\(\"\\([A-z0-9_-]+\\)\"\s*:\\)" ":\\2 "
-                    nil (region-beginning) (region-end))
-    (replace-regexp "," ""
-                    nil (region-beginning) (region-end))))
+(defun paste-from-osx ()
+  "Paste from OS X."
+  (shell-command-to-string "pbpaste"))
 
+(defun copy-to-osx (text &optional push)
+  "Copy TEXT so it is available to OS X. PUSH unused."
+  (let ((process-connection-type nil))
+    (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+      (process-send-string proc text)
+      (process-send-eof proc))))
+
+(setq interprogram-cut-function 'copy-to-osx)
+(setq interprogram-paste-function 'paste-from-osx)
 
 
 (defun open-dot-emacs ()
