@@ -22,4 +22,5 @@ projectile-bookmarks.eld
 session*
 .cask
 tramp
+.update.time
 /var/pcache
