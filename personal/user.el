@@ -27,7 +27,7 @@
 
 (defvar my-packages '(olivetti clj-refactor rainbow-delimiters rust-mode
                                flycheck-rust flycheck-clojure flycheck-pos-tip
-                               cider))
+                               cider aggressive-indent))
 
 
 (defun update-packages (packages)
@@ -101,15 +101,6 @@
 
 ;; Custom indentation for clojure
 
-;; (mapc (lambda (s) (put-clojure-indent s 1))
-;;      '(describe describe-server it before-all after-all before after
-;;                 init-state render render-state will-mount did-mount should-update
-;;                 will-receive-props will-update did-update display-name will-unmount
-;;                 describe-with-db describe-with-server swaggered))
-
-;; (mapc (lambda (s) (put-clojure-indent s 'defun))
-;;      '(GET* PUT* DELETE* POST* PATCH* context))
-
 
 (global-set-key (kbd "C-c h") 'whitespace-mode)
 
@@ -126,7 +117,8 @@
 (add-hook 'clojure-mode-hook (lambda ()
                                (switch-to-paredit)
                                (clj-refactor-mode 1)
-                               (cljr-add-keybindings-with-prefix "C-c C-r")))
+                               (cljr-add-keybindings-with-prefix "C-c C-r")
+                               (aggressive-indent-mode t)))
 
 
 (add-hook 'lisp-mode-hook #'switch-to-paredit)
@@ -138,11 +130,13 @@
                  init-state render render-state will-mount did-mount should-update
                  will-receive-props will-update did-update display-name will-unmount
                  describe-with-db describe-with-server swaggered context around
-                 legal-moves pseudo-legal-moves))
+                 legal-moves pseudo-legal-moves
+                 match))
 
 
 (mapc (lambda (s) (put-clojure-indent s 2))
       '(GET* POST* PUT* DELETE* PATCH* context*))
+
 
 ;; flycheck for clojure
 
