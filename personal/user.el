@@ -8,9 +8,14 @@
 
 ;; misc keybinding:
 
+(defun join-lines-and-remove-whitespace ()
+  (interactive)
+  (join-line)
+  (delete-trailing-whitespace))
+
 
 (global-set-key (kbd "C-o") 'other-window)
-(global-set-key (kbd "C-c j") 'join-line)
+(global-set-key (kbd "C-c j") 'join-lines-and-remove-whitespace)
 (global-set-key (kbd "C-x g") 'magit-status)
 (global-set-key (kbd "RET") 'newline-and-indent)
 
@@ -26,7 +31,7 @@
 ;; personal packages
 
 (defvar my-packages '(olivetti clj-refactor rainbow-delimiters rust-mode
-                               flycheck-rust flycheck-clojure flycheck-pos-tip
+                               flycheck-rust flycheck-pos-tip
                                cider aggressive-indent))
 
 
@@ -126,24 +131,16 @@
 
 
 (mapc (lambda (s) (put-clojure-indent s 1))
-      '(describe describe-server it before-all after-all before after
+      '(describe describe-server it
                  init-state render render-state will-mount did-mount should-update
                  will-receive-props will-update did-update display-name will-unmount
                  describe-with-db describe-with-server swaggered context around
-                 legal-moves pseudo-legal-moves
-                 match))
+                 legal-moves pseudo-legal-moves with facts fact
+                 match describe-with-mock-etl-state describe-with-es))
 
 
 (mapc (lambda (s) (put-clojure-indent s 2))
       '(GET* POST* PUT* DELETE* PATCH* context*))
-
-
-;; flycheck for clojure
-
-(eval-after-load 'flycheck '(flycheck-clojure-setup))
-(add-hook 'after-init-hook #'global-flycheck-mode)
-(eval-after-load 'flycheck
-    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
 ;; rust
 
@@ -213,6 +210,12 @@
   "Open this file."
   (interactive)
   (find-file "~/.emacs.d/personal/user.el"))
+
+
+(defun note ()
+  "Open notes.org."
+  (interactive)
+  (find-file "~/Dropbox/writing/notes.org"))
 
 
 ;; Writing settings
