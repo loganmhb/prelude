@@ -24,9 +24,11 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 
-;; stop making noise when I scroll
+(when window-system
+  (scroll-bar-mode -1)
+  ;; stop making noise when I scroll
+  (setq ring-bell-function #'ignore))
 
-(setq ring-bell-function #'ignore)
 
 ;; personal packages
 
@@ -153,16 +155,6 @@
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 
 
-(defun pretty-lambdas-haskell ()
-  "Replace \ with lambda in haskell mode."
-  (font-lock-add-keywords
-   nil `((,(concat "\\(" (regexp-quote "\\") "\\)")
-          (0 (progn (compose-region (match-beginning 1) (match-end 1)
-                                    ,(make-char 'greek-iso8859-7 107))
-                    nil))))))
-
-(add-hook 'haskell-mode-hook 'pretty-lambdas-haskell)
-
 ;; Org mode extensions
 
 (setq org-babel-clojure-backend 'cider)
@@ -230,6 +222,8 @@
                             (olivetti-mode)
                             (setq tab-width 4)))
 
+
+(server-start)
 
 (provide 'user)
 ;;; user.el ends here
