@@ -34,7 +34,7 @@
 
 (defvar my-packages '(olivetti clj-refactor rainbow-delimiters rust-mode
                                flycheck-rust flycheck-pos-tip
-                               cider aggressive-indent))
+                               cider aggressive-indent evil-smartparens))
 
 
 (defun update-packages (packages)
@@ -209,6 +209,22 @@
   (interactive)
   (find-file "~/Dropbox/writing/notes.org"))
 
+
+;; Evil modifications
+
+;; Highlight mode-line in insert mode and when there are unsaved
+;; changes in the buffer
+(lexical-let ((default-color (cons (face-background 'mode-line)
+                                   (face-foreground 'mode-line))))
+  (add-hook 'post-command-hook
+            (lambda ()
+              (let ((color (cond ((minibufferp) default-color)
+                                 ((evil-insert-state-p) '("#e80000" . "#ffffff"))
+                                 ((evil-emacs-state-p) '("#444488" . "#ffffff"))
+                                 ((buffer-modified-p) '("#006fa0" . "#ffffff"))
+                                 (t default-color))))
+                (set-face-background 'mode-line (car color))
+                (set-face-foreground 'mode-line (cdr color))))))
 
 ;; Writing settings
 
