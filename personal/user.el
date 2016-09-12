@@ -144,6 +144,8 @@
 (mapc (lambda (s) (put-clojure-indent s 2))
       '(GET* POST* PUT* DELETE* PATCH* context*))
 
+;; js
+(setq js-indent-level 2)
 ;; rust
 
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
@@ -194,8 +196,9 @@
       (process-send-string proc text)
       (process-send-eof proc))))
 
-(setq interprogram-cut-function 'copy-to-osx)
-(setq interprogram-paste-function 'paste-from-osx)
+(when (eq system-type 'darwin)
+  (setq interprogram-cut-function 'copy-to-osx)
+  (setq interprogram-paste-function 'paste-from-osx))
 
 
 (defun open-dot-emacs ()
@@ -226,6 +229,10 @@
                 (set-face-background 'mode-line (car color))
                 (set-face-foreground 'mode-line (cdr color))))))
 
+(add-hook 'smartparens-enabled-hook
+          #'evil-smartparens-mode)
+
+(evil-set-initial-state 'git-commit-mode 'insert)
 ;; Writing settings
 
 (setq prelude-whitespace nil)
